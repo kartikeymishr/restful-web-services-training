@@ -8,7 +8,7 @@ import javax.validation.constraints.Size;
 import java.util.Date;
 
 @Entity
-public class User {
+public class UserEntity {
 
     @Id
     @GeneratedValue
@@ -18,11 +18,11 @@ public class User {
     @Past
     private Date birthDate;
 
-    protected User() {
+    protected UserEntity() {
 
     }
 
-    public User(Integer id, String name, Date birthDate) {
+    public UserEntity(Integer id, String name, Date birthDate) {
         super();
         this.id = id;
         this.name = name;
