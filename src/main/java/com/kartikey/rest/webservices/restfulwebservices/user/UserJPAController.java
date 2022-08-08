@@ -19,16 +19,19 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 public class UserJPAController {
 
     @Autowired
-    private UserRepository repository;
+    private UserRepository userRepository;
+
+    @Autowired
+    private PostRepository postRepository;
 
     @GetMapping(path = "/jpa/users/all")
-    public List<UserEntity> findAllUsers() {
-        return repository.findAll();
+    public List<User> findAllUsers() {
+        return userRepository.findAll();
     }
 
     @PostMapping(path = "/jpa/users/add")
-    public ResponseEntity<Object> createUser(@Valid @RequestBody UserEntity user) {
-        UserEntity savedUser = repository.save(user);
+    public ResponseEntity<Object> createUser(@Valid @RequestBody User user) {
+        User savedUser = userRepository.save(user);
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
                 .path("/{id}")
                 .buildAndExpand(savedUser.getId())
@@ -39,14 +42,14 @@ public class UserJPAController {
     }
 
     @GetMapping(path = "/jpa/users/{id}")
-    public EntityModel<UserEntity> findUserById(@PathVariable Integer id) {
-        Optional<UserEntity> userOptional = repository.findById(id);
+    public EntityModel<User> findUserById(@PathVariable Integer id) {
+        Optional<User> userOptional = userRepository.findById(id);
         if (!userOptional.isPresent()) {
             throw new UserNotFoundException("id :: " + id);
         }
 
         // Adding HATEOAS Links to Response Object
-        EntityModel<UserEntity> entityModel = EntityModel.of(userOptional.get());
+        EntityModel<User> entityModel = EntityModel.of(userOptional.get());
         WebMvcLinkBuilder linkToUsers = linkTo(methodOn(this.getClass()).findAllUsers());
         entityModel.add(linkToUsers.withRel("all-users"));
 
@@ -55,6 +58,35 @@ public class UserJPAController {
 
     @DeleteMapping(path = "/jpa/users/remove/{id}")
     public void deleteUser(@PathVariable Integer id) {
-        repository.deleteById(id);
+        userRepository.deleteById(id);
+    }
+
+    @GetMapping(value = "/jpa/users/{id}/posts")
+    public ResponseEntity<List<Post>> getAllPostsByUser(@PathVariable Integer id) {
+        Optional<User> user = userRepository.findById(id);
+        if (!user.isPresent()) {
+            throw new UserNotFoundException("id :: " + id);
+        }
+
+        return ResponseEntity.ok(user.get().getPosts());
+    }
+
+    @PostMapping(path = "/jpa/users/{id}/posts")
+    public ResponseEntity<Object> createPost(@RequestBody Post post, @PathVariable Integer id) {
+        Optional<User> userOptional = userRepository.findById(id);
+        if (!userOptional.isPresent()) {
+            throw new UserNotFoundException("id :: " + id);
+        }
+
+        User user = userOptional.get();
+        post.setUser(user);
+        postRepository.save(post);
+
+        URI location = ServletUriComponentsBuilder.fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(post.getId())
+                .toUri();
+
+        return ResponseEntity.created(location).build();
     }
 }

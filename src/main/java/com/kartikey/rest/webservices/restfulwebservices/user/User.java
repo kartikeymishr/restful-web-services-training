@@ -3,12 +3,14 @@ package com.kartikey.rest.webservices.restfulwebservices.user;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import javax.validation.constraints.Past;
 import javax.validation.constraints.Size;
 import java.util.Date;
+import java.util.List;
 
 @Entity
-public class UserEntity {
+public class User {
 
     @Id
     @GeneratedValue
@@ -18,15 +20,19 @@ public class UserEntity {
     @Past
     private Date birthDate;
 
-    protected UserEntity() {
+    // Name of the field in Post Entity
+    @OneToMany(mappedBy = "user")
+    private List<Post> posts;
+
+    protected User() {
 
     }
 
-    public UserEntity(Integer id, String name, Date birthDate) {
-        super();
+    public User(Integer id, String name, Date birthDate, List<Post> posts) {
         this.id = id;
         this.name = name;
         this.birthDate = birthDate;
+        this.posts = posts;
     }
 
     public Integer getId() {
@@ -53,12 +59,21 @@ public class UserEntity {
         this.birthDate = birthDate;
     }
 
+    public List<Post> getPosts() {
+        return posts;
+    }
+
+    public void setPosts(List<Post> posts) {
+        this.posts = posts;
+    }
+
     @Override
     public String toString() {
-        return "User{" +
+        return "UserEntity{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
                 ", birthDate=" + birthDate +
+                ", posts=" + posts +
                 '}';
     }
 }

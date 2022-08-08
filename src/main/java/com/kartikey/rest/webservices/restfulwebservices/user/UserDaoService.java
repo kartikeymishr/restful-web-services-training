@@ -11,21 +11,21 @@ import java.util.Objects;
 @Component
 public class UserDaoService {
 
-    private static List<UserEntity> users = new ArrayList<>();
+    private static List<User> users = new ArrayList<>();
     private static Integer userCount = 4;
 
     static {
-        users.add(new UserEntity(1, "Kartikey", new Date()));
-        users.add(new UserEntity(2, "Dheeraj", new Date()));
-        users.add(new UserEntity(3, "Sandhya", new Date()));
-        users.add(new UserEntity(4, "Winnie", new Date()));
+        users.add(new User(1, "Kartikey", new Date(), new ArrayList<>()));
+        users.add(new User(2, "Dheeraj", new Date(), new ArrayList<>()));
+        users.add(new User(3, "Sandhya", new Date(), new ArrayList<>()));
+        users.add(new User(4, "Winnie", new Date(), new ArrayList<>()));
     }
 
     @Autowired
     private UserRepository repository;
 
-    public List<UserEntity> findAll() {
-        List<UserEntity> userList = users;
+    public List<User> findAll() {
+        List<User> userList = users;
         if (userList.size() == 0) {
             throw new UserNotFoundException("No users found");
         }
@@ -33,7 +33,7 @@ public class UserDaoService {
         return userList;
     }
 
-    public UserEntity save(UserEntity user) {
+    public User save(User user) {
         if (user.getId() == null) {
             user.setId(++userCount);
         }
@@ -43,9 +43,9 @@ public class UserDaoService {
         return user;
     }
 
-    public UserEntity findById(Integer id) {
-        UserEntity foundUser = null;
-        for (UserEntity user : users) {
+    public User findById(Integer id) {
+        User foundUser = null;
+        for (User user : users) {
             if (Objects.equals(user.getId(), id)) {
                 foundUser = user;
             }

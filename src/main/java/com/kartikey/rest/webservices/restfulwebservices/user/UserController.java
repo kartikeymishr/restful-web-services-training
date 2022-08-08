@@ -20,13 +20,13 @@ public class UserController {
     private UserDaoService service;
 
     @GetMapping(path = "/users/all")
-    public List<UserEntity> findAllUsers() {
+    public List<User> findAllUsers() {
         return service.findAll();
     }
 
     @PostMapping(path = "users/add")
-    public ResponseEntity<Object> createUser(@Valid @RequestBody UserEntity user) {
-        UserEntity savedUser = service.save(user);
+    public ResponseEntity<Object> createUser(@Valid @RequestBody User user) {
+        User savedUser = service.save(user);
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
                 .path("/{id}")
                 .buildAndExpand(savedUser.getId())
@@ -37,14 +37,14 @@ public class UserController {
     }
 
     @GetMapping(path = "users/{id}")
-    public EntityModel<UserEntity> findUserById(@PathVariable Integer id) {
-        UserEntity user = service.findById(id);
+    public EntityModel<User> findUserById(@PathVariable Integer id) {
+        User user = service.findById(id);
         if (user == null) {
             throw new UserNotFoundException("id :: " + id);
         }
 
         // Adding HATEOAS Links to Response Object
-        EntityModel<UserEntity> entityModel = EntityModel.of(user);
+        EntityModel<User> entityModel = EntityModel.of(user);
         WebMvcLinkBuilder linkToUsers = linkTo(methodOn(this.getClass()).findAllUsers());
         entityModel.add(linkToUsers.withRel("all-users"));
 
